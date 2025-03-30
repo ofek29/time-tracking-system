@@ -1,17 +1,21 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
+// Middleware
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
-app.get('/', (req, res) => {
-    res.send('Time Tracking API is running');
-});
+// Routes
+app.use('/api/auth', authRoutes);
 
+// Start server
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
