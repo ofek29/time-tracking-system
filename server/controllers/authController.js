@@ -2,8 +2,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { readDataFile } from '../services/fileService.js';
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY;
-const COOKIE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+const isProduction = process.env.NODE_ENV === 'production';
+const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET_KEY;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
+const ACCESS_COOKIE_MAX_AGE = 15 * 60 * 1000; // 15 minutes
+const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 
 // Login a user
 export const login = async (req, res) => {
@@ -28,19 +32,27 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Create JWT token
-        const token = generateToken(user);
+        // Create JWT tokens
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
 
         // Set cookie with JWT token
-        res.cookie('authToken', token, {
+        res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: COOKIE_MAX_AGE,
-            sameSite: 'strict'
+            secure: isProduction,
+            sameSite: 'strict',
+            maxAge: ACCESS_COOKIE_MAX_AGE
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: 'strict',
+            maxAge: REFRESH_COOKIE_MAX_AGE
         });
 
         // Return user info (without password)
-        const userWithoutPassword = { username: user.username, id: user.id, role: user.role };
+        const { password: _, ...userWithoutPassword } = user;
         return res.status(200).json({
             message: 'Login successful',
             user: userWithoutPassword
@@ -53,8 +65,10 @@ export const login = async (req, res) => {
 };
 
 // Log out a user by clearing the authentication cookie
-export const logout = (req, res) => {
-    res.clearCookie('authToken');
+export const logout = async (req, res) => {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
@@ -62,7 +76,7 @@ export const logout = (req, res) => {
 export const refreshToken = async (req, res) => {
     try {
         // Get the token from cookie
-        const token = req.cookies.authToken;
+        const token = req.cookies.refreshToken;
 
         if (!token) {
             return res.status(401).json({ message: 'Not authenticated' });
@@ -70,7 +84,7 @@ export const refreshToken = async (req, res) => {
 
         // Verify and decode the token
         try {
-            const decoded = jwt.verify(token, JWT_SECRET);
+            const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
 
             // Read users to get current user data
             const users = await readDataFile('users.json');
@@ -81,24 +95,32 @@ export const refreshToken = async (req, res) => {
             }
 
             // Generate a new token
-            const newToken = generateToken(user);
+            const newAccessToken = generateAccessToken(user);
+            const newRefreshToken = generateRefreshToken(user);
 
-            // Set the new token in a cookie
-            res.cookie('authToken', newToken, {
+            res.cookie('accessToken', newAccessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: COOKIE_MAX_AGE,
+                secure: isProduction,
+                maxAge: ACCESS_COOKIE_MAX_AGE,
                 sameSite: 'strict'
             });
 
-            const userWithoutPassword = { username: user.username, id: user.id, role: user.role };
+            res.cookie('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                secure: isProduction,
+                maxAge: REFRESH_COOKIE_MAX_AGE,
+                sameSite: 'strict'
+            });
+
+            const { password: _, ...userWithoutPassword } = user;
             return res.status(200).json({
                 message: 'Token refreshed successfully',
                 user: userWithoutPassword
             });
 
         } catch (error) {
-            res.clearCookie('authToken');
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
             return res.status(401).json({ message: 'Invalid or expired token' });
         }
     } catch (error) {
@@ -107,19 +129,18 @@ export const refreshToken = async (req, res) => {
     }
 };
 
-/**
- * Generate a JWT token for a user
- * @param {Object} user - User object containing user data
- * @returns {string} - JWT token
- */
-function generateToken(user) {
+function generateAccessToken(user) {
     return jwt.sign(
-        {
-            username: user.username,
-            id: user.id,
-            role: user.role
-        },
-        JWT_SECRET,
-        { expiresIn: '1h' }
+        { username: user.username, id: user.id, role: user.role },
+        ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m' }
+    );
+}
+
+function generateRefreshToken(user) {
+    return jwt.sign(
+        { username: user.username },
+        REFRESH_TOKEN_SECRET,
+        { expiresIn: '7d' }
     );
 }
