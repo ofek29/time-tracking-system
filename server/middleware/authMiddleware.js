@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 
-const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET;
+const ACCESS_TOKEN_SECRET = config.jwt.accessTokenSecret;
 
 export const authenticateToken = (req, res, next) => {
     const token = req.cookies.accessToken;
