@@ -1,5 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Create __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const getFilePath = (fileName) => {
     return path.join(__dirname, '..', 'data', fileName);
