@@ -23,6 +23,7 @@ export const login = async (req, res) => {
         const users = await readDataFile('users.json');
 
         const user = users[username];
+        user.username = username;
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
@@ -56,7 +57,9 @@ export const login = async (req, res) => {
         const { password: _, ...userWithoutPassword } = user;
         return res.status(200).json({
             message: 'Login successful',
-            user: userWithoutPassword
+            user: {
+                ...userWithoutPassword
+            }
         });
 
     } catch (error) {
@@ -90,6 +93,7 @@ export const refreshToken = async (req, res) => {
             // Read users to get current user data
             const users = await readDataFile('users.json');
             const user = users[decoded.username];
+            user.username = decoded.username;
 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
@@ -116,7 +120,9 @@ export const refreshToken = async (req, res) => {
             const { password: _, ...userWithoutPassword } = user;
             return res.status(200).json({
                 message: 'Token refreshed successfully',
-                user: userWithoutPassword
+                user: {
+                    ...userWithoutPassword
+                }
             });
 
         } catch (error) {
@@ -132,7 +138,7 @@ export const refreshToken = async (req, res) => {
 
 function generateAccessToken(user) {
     return jwt.sign(
-        { username: user.username, role: user.role },
+        { username: user.username, id: user.id, role: user.role },
         ACCESS_TOKEN_SECRET,
         { expiresIn: '15m' }
     );
@@ -140,7 +146,7 @@ function generateAccessToken(user) {
 
 function generateRefreshToken(user) {
     return jwt.sign(
-        { username: user.username },
+        { username: user.username, id: user.id, role: user.role },
         REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' }
     );
