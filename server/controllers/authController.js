@@ -1,14 +1,13 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { readDataFile } from '../services/fileService.js';
-import dotenv from 'dotenv';
-dotenv.config();
+import config from '../config/config.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_SECRET;
-const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET;
-const ACCESS_COOKIE_MAX_AGE = 15 * 60 * 1000; // 15 minutes
-const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const isProduction = config.isProduction;
+const ACCESS_TOKEN_SECRET = config.jwt.accessTokenSecret;
+const REFRESH_TOKEN_SECRET = config.jwt.refreshTokenSecret;
+const ACCESS_COOKIE_MAX_AGE = config.cookie.accessMaxAge;
+const REFRESH_COOKIE_MAX_AGE = config.cookie.refreshMaxAge;
 
 
 // Login a user
