@@ -4,7 +4,6 @@ import { getBerlinTime } from "../services/timeService.js";
 
 export const getUserTimesheet = async (req, res) => {
     const userId = req.user.id;
-    console.log(`User ID: ${userId}`);
     const time = await getBerlinTime();
     const timesheet = await readDataFile("timesheet.json");
     if (!timesheet) {
