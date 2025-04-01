@@ -1,4 +1,3 @@
-// import axios from "axios";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { authService } from "./authService";
 
