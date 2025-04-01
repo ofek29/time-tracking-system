@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import timeRoutes from './routes/timeRoutes.js';
 import timesheetRoutes from './routes/timesheetRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import config from './config/config.js';
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/time', timeRoutes);
 app.use('/api/timesheet', timesheetRoutes);
+app.use('/api/admin', adminRoutes);
 
 
 // Start server
