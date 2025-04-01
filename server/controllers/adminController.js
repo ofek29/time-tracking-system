@@ -9,7 +9,6 @@ export const getUsers = async (req, res) => {
             .map(([username, userData]) => ({
                 id: userData.id,
                 username,
-                role: userData.role,
             }));
         res.status(200).json(userList);
     } catch (error) {
