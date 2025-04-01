@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
+import timeRoutes from './routes/timeRoutes.js';
 import config from './config/config.js';
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/time', timeRoutes);
 
 // Start server
 const port = config.port;
