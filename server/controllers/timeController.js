@@ -1,10 +1,10 @@
-import axios from "axios";
-import { getTime } from "../services/timeService";
+import { getBerlinTime } from "../services/timeService.js";
 
 export const getTime = async (req, res) => {
     try {
-        const response = await getTime();
-        res.status(200).json(response.data);
+        const response = await getBerlinTime();
+        res.status(200).json(response);
+
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch time data" });
     }
