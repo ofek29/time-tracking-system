@@ -1,12 +1,37 @@
 {
-    "admin": {
+    "user1": {
         "id": 1,
         "password": "...",
-        "role": "admin"
+        "role": "user"
     },
-    "user1": {
+    "user2": {
         "id": 2,
         "password": "...",
         "role": "user"
+    },
+    "user3": {
+        "id": 3,
+        "password": "...",
+        "role": "user"
+    },
+    "user4": {
+        "id": 4,
+        "password": "...",
+        "role": "user"
+    },
+    "user5": {
+        "id": 5,
+        "password": "...",
+        "role": "user"
+    },
+    "user6": {
+        "id": 6,
+        "password": "...",
+        "role": "admin"
+    },
+    "admin": {
+        "id": 10,
+        "password": "...",
+        "role": "admin"
     }
 }

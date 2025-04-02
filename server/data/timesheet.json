@@ -1,10 +1,77 @@
 [
   {
     "userId": 1,
-    "records": []
+    "records": [
+      {
+        "date": "2025-04-01",
+        "checkIn": "08:55",
+        "checkOut": "17:05"
+      },
+      {
+        "date": "2025-04-02",
+        "checkIn": "09:00",
+        "checkOut": "17:10"
+      }
+    ]
   },
   {
     "userId": 2,
-    "records": []
+    "records": [
+      {
+        "date": "2025-04-01",
+        "checkIn": "08:45",
+        "checkOut": "17:15"
+      },
+      {
+        "date": "2025-04-02",
+        "checkIn": "09:20",
+        "checkOut": "17:15"
+      }
+    ]
+  },
+  {
+    "userId": 3,
+    "records": [
+      {
+        "date": "2025-04-01",
+        "checkIn": "09:05",
+        "checkOut": "17:00"
+      },
+      {
+        "date": "2025-04-02",
+        "checkIn": "08:50",
+        "checkOut": "16:55"
+      }
+    ]
+  },
+  {
+    "userId": 4,
+    "records": [
+      {
+        "date": "2025-04-01",
+        "checkIn": "09:15",
+        "checkOut": "17:10"
+      },
+      {
+        "date": "2025-04-02",
+        "checkIn": "09:30",
+        "checkOut": "17:20"
+      }
+    ]
+  },
+  {
+    "userId": 5,
+    "records": [
+      {
+        "date": "2025-04-01",
+        "checkIn": "08:40",
+        "checkOut": "16:50"
+      },
+      {
+        "date": "2025-04-02",
+        "checkIn": "09:10",
+        "checkOut": "17:00"
+      }
+    ]
   }
 ]
