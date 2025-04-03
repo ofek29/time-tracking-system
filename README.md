@@ -51,8 +51,8 @@ Users log in to access a personal dashboard showing their daily records and real
 
 ```bash
 # Clone the project
-git clone https://github.com/your-username/time-tracker.git
-cd time-tracker
+git clone https://github.com/your-username/time-tracker-system.git
+cd time-tracker-system
 
 # Setup backend
 cd server
