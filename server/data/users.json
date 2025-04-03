@@ -1,37 +1,32 @@
 {
     "user1": {
         "id": 1,
-        "password": "...",
+        "password": "$2b$10$oaNc75mFsfmiIuSjYcuMseVPVlgKUvamnk4F9ZFz05jfiHNIJKGSy",
         "role": "user"
     },
     "user2": {
         "id": 2,
-        "password": "...",
+        "password": "$2b$10$vBI2H6vshMp68OsNwidJ5.GPhFLpeUvIAHRaBRyV.QgcbuZUOZ6Fe",
         "role": "user"
     },
     "user3": {
         "id": 3,
-        "password": "...",
+        "password": "$2b$10$grfP5zLMolSrHUFcdsOExuvpuFD/lQcqoKs8dUs6LlzcYU52obnlO",
         "role": "user"
     },
     "user4": {
         "id": 4,
-        "password": "...",
+        "password": "$2b$10$uy/Ckg8lcdg9k/5Zb3Ysv.Nn1.q85xJ48Pjrom/IKYe/wXcQiIWCC",
         "role": "user"
     },
     "user5": {
         "id": 5,
-        "password": "...",
+        "password": "$2b$10$cKv4HFY/9dEXVY5ww9ea0eYAknXzD4kkyM88eclthhxLLMbx0HmSq",
         "role": "user"
-    },
-    "user6": {
-        "id": 6,
-        "password": "...",
-        "role": "admin"
     },
     "admin": {
         "id": 10,
-        "password": "...",
+        "password": "$2b$10$OwfKlvzUKqJ74rReNFyJ8OAJrfjCUnWWqpycTISQDKEaBWHXK1mem",
         "role": "admin"
     }
 }
