@@ -6,8 +6,10 @@ import config from '../config/config.js';
 const isProduction = config.isProduction;
 const ACCESS_TOKEN_SECRET = config.jwt.accessTokenSecret;
 const REFRESH_TOKEN_SECRET = config.jwt.refreshTokenSecret;
-const ACCESS_COOKIE_MAX_AGE = config.cookie.accessMaxAge;
+const ACCESS_TOKEN_EXPIRY = config.jwt.accessTokenExpiry;
+const REFRESH_TOKEN_EXPIRY = config.jwt.refreshTokenExpiry;
 const REFRESH_COOKIE_MAX_AGE = config.cookie.refreshMaxAge;
+
 
 
 // Login a user
@@ -21,10 +23,7 @@ export const login = async (req, res) => {
 
         // Read users data from file
         const users = await readDataFile('users.json');
-
         const user = users[username];
-        user.username = username;
-
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -38,14 +37,7 @@ export const login = async (req, res) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        // Set cookie with JWT token
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: 'strict',
-            maxAge: ACCESS_COOKIE_MAX_AGE
-        });
-
+        // Set cookie with JWT refresh token
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: isProduction,
@@ -56,8 +48,10 @@ export const login = async (req, res) => {
         // Return user info (without password)
         const { password: _, ...userWithoutPassword } = user;
         return res.status(200).json({
+            accessToken,
             message: 'Login successful',
             user: {
+                username,
                 ...userWithoutPassword
             }
         });
@@ -70,9 +64,7 @@ export const login = async (req, res) => {
 
 // Log out a user by clearing the authentication cookie
 export const logout = async (req, res) => {
-    res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
@@ -93,7 +85,6 @@ export const refreshToken = async (req, res) => {
             // Read users to get current user data
             const users = await readDataFile('users.json');
             const user = users[decoded.username];
-            user.username = decoded.username;
 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
@@ -102,13 +93,6 @@ export const refreshToken = async (req, res) => {
             // Generate a new token
             const newAccessToken = generateAccessToken(user);
             const newRefreshToken = generateRefreshToken(user);
-
-            res.cookie('accessToken', newAccessToken, {
-                httpOnly: true,
-                secure: isProduction,
-                maxAge: ACCESS_COOKIE_MAX_AGE,
-                sameSite: 'strict'
-            });
 
             res.cookie('refreshToken', newRefreshToken, {
                 httpOnly: true,
@@ -119,19 +103,19 @@ export const refreshToken = async (req, res) => {
 
             const { password: _, ...userWithoutPassword } = user;
             return res.status(200).json({
+                accessToken: newAccessToken,
                 message: 'Token refreshed successfully',
                 user: {
+                    username: decoded.username,
                     ...userWithoutPassword
                 }
             });
 
         } catch (error) {
-            res.clearCookie('accessToken');
             res.clearCookie('refreshToken');
             return res.status(401).json({ message: 'Invalid or expired token' });
         }
     } catch (error) {
-        console.error('Token refresh error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -140,7 +124,7 @@ function generateAccessToken(user) {
     return jwt.sign(
         { username: user.username, id: user.id, role: user.role },
         ACCESS_TOKEN_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: ACCESS_TOKEN_EXPIRY }
     );
 }
 
@@ -148,6 +132,6 @@ function generateRefreshToken(user) {
     return jwt.sign(
         { username: user.username, id: user.id, role: user.role },
         REFRESH_TOKEN_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: REFRESH_TOKEN_EXPIRY }
     );
 }

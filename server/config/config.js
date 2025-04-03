@@ -10,7 +10,6 @@ export default {
         refreshTokenExpiry: '7d'
     },
     cookie: {
-        accessMaxAge: 15 * 60 * 1000, // 15 minutes
         refreshMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
     isProduction: process.env.NODE_ENV === 'production'
