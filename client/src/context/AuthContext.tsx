@@ -2,10 +2,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { authService } from '../api/authService';
 import { User } from '@/types/auth.types';
 import { useNavigate } from 'react-router-dom';
+import { setAccessToken } from '@/api/api';
 
 // Define the shape of auth state
 interface AuthState {
     user: User | null;
+    accessToken: string | null;
     isAuthenticated: boolean;
     loading: boolean;
     error: string | null;
@@ -29,6 +31,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [state, setState] = useState<AuthState>({
         user: null,
+        accessToken: null,
         isAuthenticated: false,
         loading: false,
         error: null,
@@ -39,12 +42,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const checkAuthStatus = async () => {
             try {
                 const userData = await authService.getCurrentUser();
-                setState({
+                setState((prev) => ({
+                    ...prev,
                     user: userData.user,
                     isAuthenticated: true,
                     loading: false,
                     error: null,
-                });
+                }));
 
             } catch {
                 // If the get user request fails, try refreshing the token
@@ -52,6 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     const userData = await authService.refreshToken();
                     setState({
                         user: userData.user,
+                        accessToken: userData.accessToken,
                         isAuthenticated: true,
                         loading: false,
                         error: null,
@@ -60,6 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     // If refresh fails too, the user is not authenticated
                     setState({
                         user: null,
+                        accessToken: null,
                         isAuthenticated: false,
                         loading: false,
                         error: null,
@@ -71,6 +77,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         checkAuthStatus();
     }, []);
 
+    // Update the access token from the axios interceptor
+    useEffect(() => {
+        setAccessToken(state.accessToken);
+    }, [state.accessToken]);
+
     // Login function
     const login = async (username: string, password: string) => {
         setState({ ...state, loading: true, error: null });
@@ -79,6 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             setState({
                 user: data.user,
+                accessToken: data.accessToken,
                 isAuthenticated: true,
                 loading: false,
                 error: null,
@@ -94,6 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const navigate = useNavigate();
+
     // Logout function
     const logout = async () => {
         setState({ ...state, loading: true });
@@ -103,12 +116,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } finally {
             setState({
                 user: null,
+                accessToken: null,
                 isAuthenticated: false,
                 loading: false,
                 error: null,
             });
             navigate('/login');
-
         }
     };
 

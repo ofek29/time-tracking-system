@@ -8,7 +8,24 @@ const axiosInstance = axios.create({
     headers: { "Content-Type": "application/json" },
 });
 
-let isRefreshing = false;
+// Store token in memory for API requests
+let accessToken: string | null = null;
+
+// Function to set the access token
+export const setAccessToken = (token: string | null) => {
+    accessToken = token;
+};
+
+// Request Interceptor - add token to each request
+axiosInstance.interceptors.request.use(
+    (config) => {
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 type FailedRequest = {
     resolve: (value?: AxiosResponse) => void;
@@ -16,6 +33,7 @@ type FailedRequest = {
 };
 
 let failedQueue: FailedRequest[] = [];
+let isRefreshing = false;
 
 const processQueue = (error: unknown) => {
     failedQueue.forEach(({ resolve, reject }) => {
@@ -28,7 +46,7 @@ const processQueue = (error: unknown) => {
     failedQueue = [];
 };
 
-// Response Interceptor
+// Response Interceptor - handle token refresh
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError): Promise<AxiosResponse | unknown> => {
@@ -48,7 +66,8 @@ axiosInstance.interceptors.response.use(
         isRefreshing = true;
 
         try {
-            await authService.refreshToken();
+            const refreshResult = await authService.refreshToken();
+            setAccessToken(refreshResult.accessToken);
             processQueue(null);
             return axiosInstance(originalRequest);
         } catch (refreshError: unknown) {
@@ -60,10 +79,4 @@ axiosInstance.interceptors.response.use(
     }
 );
 
-
 export default axiosInstance;
-
-
-
-
-
