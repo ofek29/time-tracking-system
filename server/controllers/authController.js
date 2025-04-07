@@ -52,6 +52,7 @@ export const login = async (req, res) => {
             accessToken,
             message: 'Login successful',
             user: {
+                username,
                 ...userWithoutPassword
             }
         });
@@ -105,6 +106,7 @@ export const refreshToken = async (req, res) => {
                 accessToken: newAccessToken,
                 message: 'Token refreshed successfully',
                 user: {
+                    username: decoded.username,
                     ...userWithoutPassword
                 }
             });
