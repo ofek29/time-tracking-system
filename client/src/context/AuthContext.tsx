@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '../api/authService';
 import { User } from '@/types/auth.types';
-import { useNavigate } from 'react-router-dom';
 import { setAccessToken } from '@/api/api';
+import { AxiosError } from 'axios';
 
 // Define the shape of auth state
 interface AuthState {
@@ -96,17 +96,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 loading: false,
                 error: null,
             });
-        } catch (error: any) {
+        } catch (error) {
+            const axiosError = error as AxiosError<{ message: string }>;
             setState({
                 ...state,
                 loading: false,
-                error: error.message || 'Login failed',
+                error: axiosError.response?.data?.message ||
+                    axiosError.message ||
+                    'An error occurred during login',
             });
-            throw error;
         }
     };
-
-    const navigate = useNavigate();
 
     // Logout function
     const logout = async () => {
@@ -122,7 +122,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 loading: false,
                 error: null,
             });
-            navigate('/login');
         }
     };
 
