@@ -21,7 +21,9 @@ export const getUserTimesheet = async (req, res) => {
 
 export const checkIn = async (req, res) => {
     const userId = req.user.id;
-    const time = await getBerlinTime();
+    const berlinTime = await getBerlinTime();
+    const date = berlinTime.date;
+    const time = `${berlinTime.hour}:${berlinTime.minute}`;
 
     const timesheet = await readDataFile("timesheet.json");
     const userTimesheet = timesheet.find((user) => user.userId === userId);
@@ -29,30 +31,32 @@ export const checkIn = async (req, res) => {
     if (!userTimesheet) {
         timesheet.push({
             userId,
-            records: [{ date: time.date, checkIn: time.time }]
+            records: [{ date: date, checkIn: time }]
         });
     } else {
-        const record = userTimesheet.records.find(r => r.date === time.date);
+        const record = userTimesheet.records.find(r => r.date === date);
         if (record) {
             if (record.checkIn) {
                 return res.status(400).json({ message: "Already checked in today" });
             }
-            record.checkIn = time.time;
+            record.checkIn = time;
         } else {
             userTimesheet.records.push({
-                date: time.date,
-                checkIn: time.time
+                date: date,
+                checkIn: time
             });
         }
     }
 
     await writeDataFile("timesheet.json", timesheet);
-    return res.status(200).json({ message: "Check-in successful", time: time.time });
+    return res.status(200).json({ message: "Check-in successful", time: time });
 }
 
 export const checkOut = async (req, res) => {
     const userId = req.user.id;
-    const time = await getBerlinTime();
+    const berlinTime = await getBerlinTime();
+    const date = berlinTime.date;
+    const time = `${berlinTime.hour}:${berlinTime.minute}`;
 
     const timesheet = await readDataFile("timesheet.json");
     const userTimesheet = timesheet.find(user => user.userId === userId);
@@ -61,7 +65,7 @@ export const checkOut = async (req, res) => {
         return res.status(400).json({ message: "Check-in not found for today" });
     }
 
-    const record = userTimesheet.records.find(r => r.date === time.date);
+    const record = userTimesheet.records.find(r => r.date === date);
 
     if (!record || !record.checkIn) {
         return res.status(400).json({ message: "Check-in not found for today" });
@@ -71,8 +75,8 @@ export const checkOut = async (req, res) => {
         return res.status(400).json({ message: "Already checked out today" });
     }
 
-    record.checkOut = time.time;
+    record.checkOut = time;
 
     await writeDataFile("timesheet.json", timesheet);
-    return res.status(200).json({ message: "Check-out successful", time: time.time });
+    return res.status(200).json({ message: "Check-out successful", time: time });
 };
