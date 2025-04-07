@@ -37,6 +37,7 @@ export default function AdminPanel() {
         fetchUserTimesheet();
     }, [selectedUserId]);
 
+
     const updateField = (index: number, field: "checkIn" | "checkOut", value: string) => {
         setEditing((prev) => {
             const updated = [...prev];
@@ -58,80 +59,82 @@ export default function AdminPanel() {
     };
 
     return (
-        <div className="p-6 max-w-4xl mx-auto space-y-6">
-            <h1 className="text-2xl font-bold text-center">Admin Panel</h1>
-            <button
-                className="text-sm text-red-500"
-                onClick={() => {
-                    logout();
-                }}
-            >
-                Logout
-            </button>
+        <div className="flex items-center min-h-screen min-w-md bg-slate-50">
+            <div className="w-full max-w-xl p-6 space-y-6 mx-auto">
+                <h1 className="text-2xl font-bold text-center">Admin Panel</h1>
+                <button
+                    className="text-sm text-red-500"
+                    onClick={() => {
+                        logout();
+                    }}
+                >
+                    Logout
+                </button>
 
-            <Card>
-                <CardContent className="p-4 space-y-4 flex flex-col items-center">
-                    <h2 className="text-lg font-semibold">Select a User</h2>
-                    <Select onValueChange={(val) => setSelectedUserId(Number(val))}>
-                        <SelectTrigger className="w-full max-w-xs">
-                            <SelectValue placeholder="Select a user" />
-                        </SelectTrigger>
-                        <SelectContent >
-                            {users.map((user) => (
-                                <SelectItem key={user.id} value={String(user.id)}>
-                                    {user.username}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </CardContent>
-            </Card>
-
-            {selectedUserId && (
                 <Card>
-                    <CardContent className="p-4 space-y-4">
-                        <h2 className="text-lg font-semibold">Timesheet Records</h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="py-2 px-3">Date</th>
-                                        <th className="py-2 px-3">Check-In</th>
-                                        <th className="py-2 px-3">Check-Out</th>
-                                        <th className="py-2 px-3">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {editing.map((record, index) => (
-                                        <tr key={record.date} className="border-b">
-                                            <td className="py-2 px-3 whitespace-nowrap">{record.date}</td>
-                                            <td className="py-2 px-3">
-                                                <Input
-                                                    value={record.checkIn || ""}
-                                                    onChange={(e) => updateField(index, "checkIn", e.target.value)}
-                                                    className="w-28 border rounded px-2 py-1 text-sm"
-                                                />
-                                            </td>
-                                            <td className="py-2 px-3">
-                                                <Input
-                                                    value={record.checkOut || ""}
-                                                    onChange={(e) => updateField(index, "checkOut", e.target.value)}
-                                                    className="w-28 border rounded px-2 py-1 text-sm"
-                                                />
-                                            </td>
-                                            <td className="py-2 px-3">
-                                                <Button onClick={() => handleSave(record)} size="sm">
-                                                    Save
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                    <CardContent className="p-4 space-y-4 flex flex-col items-center">
+                        <h2 className="text-lg font-semibold">Select a User:</h2>
+                        <Select onValueChange={(val) => setSelectedUserId(Number(val))}>
+                            <SelectTrigger className="w-3xs text-white">
+                                <SelectValue placeholder={<span className="text-white">Select a user</span>} />
+                            </SelectTrigger>
+                            <SelectContent >
+                                {users.map((user) => (
+                                    <SelectItem key={user.id} value={String(user.id)}>
+                                        {user.username}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </CardContent>
                 </Card>
-            )}
+
+                {selectedUserId && (
+                    <Card>
+                        <CardContent className="p-4 space-y-4">
+                            <h2 className="text-lg font-semibold">Timesheet Records</h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead>
+                                        <tr className="border-b">
+                                            <th className="py-2 px-3">Date</th>
+                                            <th className="py-2 px-3">Check-In</th>
+                                            <th className="py-2 px-3">Check-Out</th>
+                                            <th className="py-2 px-3">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {editing.map((record, index) => (
+                                            <tr key={record.date} className="border-b">
+                                                <td className="py-2 px-3 whitespace-nowrap">{record.date}</td>
+                                                <td className="py-2 px-3">
+                                                    <Input
+                                                        value={record.checkIn || ""}
+                                                        onChange={(e) => updateField(index, "checkIn", e.target.value)}
+                                                        className="w-28 border rounded px-2 py-1 text-sm"
+                                                    />
+                                                </td>
+                                                <td className="py-2 px-3">
+                                                    <Input
+                                                        value={record.checkOut || ""}
+                                                        onChange={(e) => updateField(index, "checkOut", e.target.value)}
+                                                        className="w-28 border rounded px-2 py-1 text-sm"
+                                                    />
+                                                </td>
+                                                <td className="py-2 px-3">
+                                                    <Button onClick={() => handleSave(record)} size="sm">
+                                                        Save
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+            </div>
         </div>
     );
 }

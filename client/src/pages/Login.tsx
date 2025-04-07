@@ -22,7 +22,7 @@ export default function Login() {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-slate-50">
-            <div className="w-full max-w-md p-4 space-y-6">
+            <div className="w-full max-w-md p-6 space-y-6">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold tracking-tight">Time Tracking System</h1>
                 </div>
