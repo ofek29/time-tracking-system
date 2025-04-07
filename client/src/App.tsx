@@ -4,8 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from './pages/Dashboard';
 import { useAuth } from './context/AuthContext';
 import AdminPanel from './pages/AdminPanel';
-// import { RequireAuth } from './auth/RequireAuth';
-
+import { RequireAuth } from './auth/RequireAuth';
 
 function App() {
   const { isAuthenticated, user } = useAuth();
@@ -35,25 +34,14 @@ function App() {
         }
       />
 
-      {/* User dashboard - only accessible to authenticated users with "user" role */}
-      <Route
-        path="/dashboard"
-        element={
-          isAuthenticated && user?.role === "user"
-            ? <Dashboard />
-            : <Navigate to="/login" replace />
-        }
-      />
+      {/* Protected routes */}
+      <Route element={<RequireAuth allowedRoles={["user"]} />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Route>
 
-      {/* Admin panel - only accessible to authenticated users with "admin" role */}
-      <Route
-        path="/admin"
-        element={
-          isAuthenticated && user?.role === "admin"
-            ? <AdminPanel />
-            : <Navigate to="/login" replace />
-        }
-      />
+      <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+        <Route path="/admin" element={<AdminPanel />} />
+      </Route>
 
       {/* Redirect to home for any unmatched routes */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -61,4 +49,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
