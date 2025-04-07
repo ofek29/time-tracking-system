@@ -45,6 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 setState((prev) => ({
                     ...prev,
                     user: userData.user,
+                    accessToken: userData.accessToken || prev.accessToken,
                     isAuthenticated: true,
                     loading: false,
                     error: null,
