@@ -27,6 +27,7 @@ export const login = async (req, res) => {
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+        user.username = username;
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
@@ -51,7 +52,6 @@ export const login = async (req, res) => {
             accessToken,
             message: 'Login successful',
             user: {
-                username,
                 ...userWithoutPassword
             }
         });
@@ -73,7 +73,6 @@ export const refreshToken = async (req, res) => {
     try {
         // Get the token from cookie
         const token = req.cookies.refreshToken;
-
         if (!token) {
             return res.status(401).json({ message: 'Not authenticated' });
         }
@@ -85,10 +84,10 @@ export const refreshToken = async (req, res) => {
             // Read users to get current user data
             const users = await readDataFile('users.json');
             const user = users[decoded.username];
-
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
+            user.username = decoded.username;
 
             // Generate a new token
             const newAccessToken = generateAccessToken(user);
@@ -106,7 +105,6 @@ export const refreshToken = async (req, res) => {
                 accessToken: newAccessToken,
                 message: 'Token refreshed successfully',
                 user: {
-                    username: decoded.username,
                     ...userWithoutPassword
                 }
             });
